@@ -1,0 +1,12 @@
+CREATE TABLE "RefreshTokens"(
+    "Id" SERIAL PRIMARY KEY,
+    "CreateTime" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "UpdateTime" TIMESTAMP,
+    "Token" VARCHAR(120) NOT NULL,
+    "ExpireDate" TIMESTAMP NOT NULL,
+    "IsUsed" BOOLEAN NOT NULL DEFAULT false,
+    "CreatedBy" VARCHAR(15) NOT NULL,
+    "ReplacedByToken" VARCHAR(120) NULL,
+    "UsedBy" VARCHAR(15) NULL,
+    "UserId" BIGINT NOT NULL
+);
