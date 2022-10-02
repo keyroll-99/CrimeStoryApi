@@ -1,11 +1,12 @@
+using Authentication.Contracts.Response;
+using Authentication.Contracts.Response.ApiResponse;
+
 namespace Authentication.Contracts;
 
 public interface IAuthenticationService
 {
-    long? ValidateJwtToken(string? token);
-    string GenerateJwtToken(long userId);
+    long? ValidateJwt(string? token);
+    string GenerateJwt(long userId);
+    Task<RefreshResponse> RefreshToken(string currentToken, string ipAddress);
     Task<string> GenerateRefreshToken(long userId, string ipAddress);
-    Task RevokeAllRefreshToken(long userId, string ipAddress);
-    Task RevokeRefreshToken(string token, string ipAddress);
-    Task<bool> IsValidRefreshToken(string token);
 }

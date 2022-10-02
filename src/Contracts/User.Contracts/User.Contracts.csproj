@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Request\ApiRequest" />
+      <Folder Include="Response\ApiResponse" />
+    </ItemGroup>
+
 </Project>

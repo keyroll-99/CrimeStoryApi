@@ -4,10 +4,15 @@ using System.Security.Cryptography;
 using System.Text;
 using Authentication.Contracts;
 using Authentication.Contracts.Models;
+using Authentication.Contracts.Request;
+using Authentication.Contracts.Response;
+using Authentication.Contracts.Response.ApiResponse;
 using Authentication.Core.Entities;
 using Authentication.Core.Repository;
+using Core.Exceptions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using User.Contracts;
 
 namespace Authentication.Application.Services;
 
@@ -21,8 +26,8 @@ public class AuthenticationService : IAuthenticationService
         _jwtSettings = jwtSettings.Value;
         _refreshTokenRepository = refreshTokenRepository;
     }
-    
-    public long? ValidateJwtToken(string? token)
+
+    public long? ValidateJwt(string? token)
     {
         if (token is null)
         {
@@ -54,7 +59,7 @@ public class AuthenticationService : IAuthenticationService
         }
     }
 
-    public string GenerateJwtToken(long userId)
+    public string GenerateJwt(long userId)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_jwtSettings.Key);
@@ -71,6 +76,27 @@ public class AuthenticationService : IAuthenticationService
         return tokenHandler.WriteToken(token);
     }
 
+    public async Task<RefreshResponse> RefreshToken(string currentToken, string ipAddress)
+    {
+        if (!await IsValidRefreshToken(currentToken))
+        {
+            await RevokeAllConnectedRefreshToken(currentToken, ipAddress);
+            throw new ServerError("Invalid refresh token");
+        }
+
+        var token = await _refreshTokenRepository.GetRefreshTokenByTokenAsync(currentToken);
+
+        await RevokeRefreshToken(token, ipAddress);
+        var newToken = await GenerateRefreshToken(token.UserId, ipAddress);
+        var jwt = GenerateJwt(token.UserId);
+
+        return new RefreshResponse
+        {
+            Jwt = jwt,
+            RefreshToken = newToken
+        };
+    }
+
     public async Task<string> GenerateRefreshToken(long userId, string ipAddress)
     {
         var refreshToken = new RefreshToken
@@ -85,10 +111,11 @@ public class AuthenticationService : IAuthenticationService
 
         return refreshToken.Token;
     }
-
-    public async Task RevokeAllRefreshToken(long userId, string ipAddress)
+    
+    private async Task RevokeAllConnectedRefreshToken(string refreshToken, string ipAddress)
     {
-        var userTokens = await _refreshTokenRepository.GetAllUserRefreshTokensAsync(userId);
+        var token = await _refreshTokenRepository.GetRefreshTokenByTokenAsync(refreshToken);
+        var userTokens = await _refreshTokenRepository.GetAllUserRefreshTokensAsync(token.UserId);
 
         foreach (var userToken in userTokens)
         {
@@ -99,16 +126,15 @@ public class AuthenticationService : IAuthenticationService
         await _refreshTokenRepository.UpdateRangeAsync(userTokens);
     }
 
-    public async Task RevokeRefreshToken(string token, string ipAddress)
+    private async Task RevokeRefreshToken(RefreshToken token, string ipAddress)
     {
-        var refreshToken = await _refreshTokenRepository.GetRefreshTokenByTokenAsync(token);
-        refreshToken.UsedBy = ipAddress;
-        refreshToken.IsUsed = true;
+        token.UsedBy = ipAddress;
+        token.IsUsed = true;
 
-        await _refreshTokenRepository.UpdateAsync(refreshToken);
+        await _refreshTokenRepository.UpdateAsync(token);
     }
 
-    public async Task<bool> IsValidRefreshToken(string token)
+    private async Task<bool> IsValidRefreshToken(string token)
     {
         var refreshToken = await _refreshTokenRepository.GetRefreshTokenByTokenAsync(token);
 

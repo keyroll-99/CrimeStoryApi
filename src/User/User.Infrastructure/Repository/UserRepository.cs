@@ -13,6 +13,16 @@ public class UserRepository: Repository<Core.Entities.User, UserContext>, IUserR
 
     public async Task<List<Core.Entities.User>> GetAll()
     {
-        return await _appContext.Users.ToListAsync();
+        return await Entities.ToListAsync();
+    }
+
+    public async Task<bool> UserExists(string username)
+    {
+        return await Entities.AnyAsync(x => x.Username == username);
+    }
+
+    public async Task<Core.Entities.User> GetByUsername(string username)
+    {
+        return await Entities.SingleAsync(x => x.Username == username);
     }
 }

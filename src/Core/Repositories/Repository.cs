@@ -1,4 +1,5 @@
 using Core.Entities;
+using Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Repositories;
@@ -19,6 +20,10 @@ public class Repository<T, AppContextT> : IRepository<T>
     public async Task<T> AddAsync(T entity)
     {
         entity.CreateAt = DateTime.UtcNow;
+        if (entity.Hash == Guid.Empty)
+        {
+            entity.Hash = Guid.NewGuid();
+        }
         Entities.Add(entity);
         await _appContext.SaveChangesAsync();
         return entity;
@@ -26,7 +31,8 @@ public class Repository<T, AppContextT> : IRepository<T>
 
     public async Task<T> UpdateAsync(T entity)
     {
-        entity.UpdateAt = DateTime.UtcNow;
+        entity.UpdateAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
+        // entity.UpdateAt.Value.
         Entities.Update(entity);
         await _appContext.SaveChangesAsync();
         return entity;
@@ -64,7 +70,13 @@ public class Repository<T, AppContextT> : IRepository<T>
 
     public async Task<T> GetByIdAsync(long id)
     {
-        return await Entities.SingleAsync(x => x.Id == id);
+        var entity = await Entities.FirstOrDefaultAsync(x => x.Id == id);
+        if (entity is null)
+        {
+            throw new ServerError();
+        }
+
+        return entity;
     }
 
     public async Task<T> GetByHashAsync(Guid hash)

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using User.Application.Mapper;
 using User.Application.Services;
 using User.Contracts;
 
@@ -9,6 +10,7 @@ public static class UserApplicationStartup
     public static IServiceCollection InstallUserApplication (this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddAutoMapper(typeof(UserMapper));
         
         return services;
     }

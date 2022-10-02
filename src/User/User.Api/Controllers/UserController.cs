@@ -1,12 +1,13 @@
+using Core.Attribute;
 using Microsoft.AspNetCore.Mvc;
 using User.Contracts;
-using User.Contracts.Reponse;
 
-namespace Api.Controllers.User;
+namespace User.Api.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-public class UserController
+[Authorize]
+public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
@@ -16,7 +17,8 @@ public class UserController
     }
 
     [HttpGet]
-    public async Task<List<UserResponse>> GetAllUsers()
+    [Authorize]
+    public async Task<List<global::User.Contracts.Response.UserDto>> GetAllUsers()
     {
         return await _userService.GetAllUsersAsync();
     }

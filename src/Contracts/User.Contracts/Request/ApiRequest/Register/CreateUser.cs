@@ -1,6 +1,6 @@
-namespace Authentication.Contracts.Request;
+namespace User.Contracts.Request.ApiRequest.Register;
 
-public class LoginRequest
+public class CreateUser
 {
     public string Username { get; set; }
     public string Password { get; set; }

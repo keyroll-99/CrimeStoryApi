@@ -1,6 +1,6 @@
-namespace User.Contracts.Reponse;
+namespace User.Contracts.Response;
 
-public class UserResponse
+public class UserDto
 {
     public long Id { get; set; }
     public Guid Hash { get; set; }

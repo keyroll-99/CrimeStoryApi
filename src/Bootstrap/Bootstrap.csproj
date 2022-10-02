@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Authentication\Authentication.Infrastructure\Authentication.Infrastructure.csproj" />
-      <ProjectReference Include="..\User\User.Infrastructure\User.Infrastructure.csproj" />
+      <ProjectReference Include="..\Authentication\Authentication.Api\Authentication.Api.csproj" />
+      <ProjectReference Include="..\User\User.Api\User.Api.csproj" />
     </ItemGroup>
 
 </Project>

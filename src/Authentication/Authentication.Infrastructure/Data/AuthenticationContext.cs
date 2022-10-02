@@ -8,6 +8,6 @@ public class AuthenticationContext: DbContext
     public AuthenticationContext(DbContextOptions options) : base(options)
     {
     }
-    
+
     public DbSet<RefreshToken> RefreshTokens { get; set; }
 }
