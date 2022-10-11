@@ -9,10 +9,12 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="6.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Authentication.Infrastructure\Authentication.Infrastructure.csproj" />
+        <ProjectReference Include="..\Authentication.Infrastructure\Authentication.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

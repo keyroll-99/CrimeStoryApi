@@ -17,11 +17,18 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         services.AddCoreProject();
-        services.AddUserModules(_configuration);
-        services.AddAuthenticationModules(_configuration);
+        services.AddUserModules();
+        services.AddAuthenticationModules();
 
         services.AddControllers();
+
+        services.AddCors(o =>
+        {
+            o.AddPolicy("localPolicy",
+                p => { p.SetIsOriginAllowed(x => true).AllowAnyHeader().AllowAnyMethod().AllowCredentials(); });
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -34,6 +41,12 @@ public class Startup
         app.UseRouting();
 
         app.UseAuthentication();
+
+        app.UseCors(x => x
+            .SetIsOriginAllowed(o => true)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials());
 
         app.UseAuthenticationMiddleware();
 

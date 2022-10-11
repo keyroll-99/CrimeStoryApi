@@ -8,13 +8,17 @@ public struct LoggedUserData
 
 public class LoggedUser
 {
-    private LoggedUserData _loggedUserData;
+    public LoggedUserData LoggedUserData { get; private set; }
 
     public void SetLoggedUser(LoggedUserData loggedUserData)
     {
-        _loggedUserData = loggedUserData;
+        if (LoggedUserData.Id != 0)
+        {
+            return;
+        }
+        LoggedUserData = loggedUserData;
     }
 
     public LoggedUserData GetLoggedUser()
-        => _loggedUserData;
+        => LoggedUserData;
 }

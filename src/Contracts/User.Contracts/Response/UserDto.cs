@@ -5,4 +5,5 @@ public class UserDto
     public long Id { get; set; }
     public Guid Hash { get; set; }
     public string Username { get; set; }
+    public string Email { get; set; }
 }

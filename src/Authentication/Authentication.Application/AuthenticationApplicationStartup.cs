@@ -1,6 +1,5 @@
 using Authentication.Application.Services;
 using Authentication.Contracts;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Authentication.Application;

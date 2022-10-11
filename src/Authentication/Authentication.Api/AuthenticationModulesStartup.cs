@@ -1,6 +1,7 @@
 ﻿using Authentication.Api.Middleware;
 using Authentication.Contracts.Models;
 using Authentication.Infrastructure;
+using Core.Utils;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,13 +10,19 @@ namespace Authentication.Api;
 
 public static class AuthenticationModulesStartup
 {
-    public static IServiceCollection AddAuthenticationModules(this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddAuthenticationModules(this IServiceCollection services)
     {
-        services.Configure<JwtSettings>(configuration.GetSection("JWT"))
+        var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        var config = new ConfigurationBuilder()
+            .SetBasePath(PathUtils.GetModulePath("Authentication.Api"))
+            .AddJsonFile("appsettings.authentication.json")
+            .AddJsonFile($"appsettings.authentication.{env}.json").Build();
+        
+        services.Configure<JwtSettings>(config.GetSection("JWT"))
             .AddSingleton<JwtSettings>();
         
-        services.InstallAuthenticationInfrastructure(configuration);
+        services.InstallAuthenticationInfrastructure(config);
         return services;
     }
 

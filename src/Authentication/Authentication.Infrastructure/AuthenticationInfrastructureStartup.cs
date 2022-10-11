@@ -14,6 +14,7 @@ public static class AuthenticationInfrastructureStartup
     public static IServiceCollection InstallAuthenticationInfrastructure(this IServiceCollection services,
         IConfiguration configuration)
     {
+        
         services.AddDbContext<AuthenticationContext>(o => 
             o.UseNpgsql(configuration.GetConnectionString("DefaultConnection")!));
 

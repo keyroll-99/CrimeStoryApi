@@ -1,27 +1,22 @@
+using Core.Utils;
 using SqlRunner;
 using SqlRunner.models;
 
 namespace Authentication.Core;
 
-public class AuthenticationScriptRunner
+public static class AuthenticationScriptRunner
 {
     public static void RunScripts(string connectionsString)
     {
+        var scriptPath = $"{PathUtils.GetModulePath("Authentication.Core")}{Path.DirectorySeparatorChar}Scripts";
         var setupModel = new SetupModel
         {
             ConnectionString = connectionsString,
-            FolderPath = $"{GetPatchToScript()}",
+            FolderPath = scriptPath,
             DataBaseType = DataBaseTypeEnum.Postgresql,
-            DeployScriptsTableName = "DeployScripts"
+            DeployScriptsTableName = "AuthenticationDeployScripts",
+            InitFolderPath = $"{scriptPath}/Init"
         };
         SqlScriptRunner.GetScriptRunner(setupModel).RunDeploy();
-    }
-
-    private static string GetPatchToScript()
-    {
-        var rootPath = Directory.GetParent(Directory.GetCurrentDirectory());
-
-        return
-            $"{rootPath}{Path.DirectorySeparatorChar}Authentication{Path.DirectorySeparatorChar}Authentication.Core{Path.DirectorySeparatorChar}Scripts";
     }
 }

@@ -11,11 +11,9 @@
       <ProjectReference Include="..\..\Contracts\User.Contracts\User.Contracts.csproj" />
       <ProjectReference Include="..\..\Core\Core.csproj" />
     </ItemGroup>
-
+    
     <ItemGroup>
-      <Reference Include="SqlRunner">
-        <HintPath>..\..\..\..\..\..\..\..\.nuget\packages\sqlscriptrunner\0.1.4\lib\net6.0\SqlRunner.dll</HintPath>
-      </Reference>
+      <PackageReference Include="SqlScriptRunner" Version="0.2.0" />
     </ItemGroup>
 
 </Project>

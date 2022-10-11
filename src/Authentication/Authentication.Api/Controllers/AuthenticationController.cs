@@ -1,8 +1,7 @@
 using Authentication.Contracts;
-using Authentication.Contracts.Request;
 using Authentication.Contracts.Request.ApiRequest;
-using Authentication.Contracts.Response;
 using Authentication.Contracts.Response.ApiResponse;
+using Core.Attribute;
 using Core.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,8 +12,8 @@ namespace Authentication.Api.Controllers;
 
 [Route("Api/[controller]")]
 [ApiController]
-[global::Core.Attribute.AllowAnonymous]
-public class AuthenticationController: ControllerBase
+[AllowAnonymous]
+public class AuthenticationController : ControllerBase
 {
     private const string RefreshTokenCookieName = "refreshToken";
     private readonly IAuthenticationService _authenticationService;
@@ -51,9 +50,10 @@ public class AuthenticationController: ControllerBase
         var user = await _userService.CreateUser(new CreateUser
         {
             Password = form.Password,
-            Username = form.Username
+            Username = form.Username,
+            Email = form.Email
         });
-        
+
         var refreshToken = await _authenticationService.GenerateRefreshToken(user.Id, GetIpAddress());
         SetTokenCookie(refreshToken);
         var jwt = _authenticationService.GenerateJwt(user.Id);
@@ -65,14 +65,14 @@ public class AuthenticationController: ControllerBase
     }
 
     [HttpPost("Refresh")]
-    public async Task<AuthenticationResponse> RefreshToken()
+    public async Task<AuthenticationResponse> RefreshToken(CancellationToken cancellationToken)
     {
         var refreshToken = GetRefreshTokenFromCookie();
-        
+
         var ipAddress = GetIpAddress();
 
-        var refreshResponse = await _authenticationService.RefreshToken(refreshToken, ipAddress);
-        SetTokenCookie(refreshToken);
+        var refreshResponse = await _authenticationService.RefreshToken(refreshToken, ipAddress, cancellationToken);
+        SetTokenCookie(refreshResponse.RefreshToken);
 
         return new AuthenticationResponse
         {
@@ -89,8 +89,8 @@ public class AuthenticationController: ControllerBase
             Secure = true,
             SameSite = SameSiteMode.None
         };
-        
-        Response.Cookies.Append(RefreshTokenCookieName, token);
+
+        Response.Cookies.Append(RefreshTokenCookieName, token, cookieOptions);
     }
 
     private string GetRefreshTokenFromCookie()

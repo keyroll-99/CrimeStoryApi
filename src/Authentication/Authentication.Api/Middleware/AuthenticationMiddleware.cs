@@ -22,13 +22,13 @@ public class AuthenticationMiddleware
         IUserService userService)
     {
         var token = context.Request.Headers[AuthorizationHeader].ToString().Split(" ").Last();
-        
+
         var userId = authenticationService.ValidateJwt(token);
 
         if (userId.HasValue)
         {
             var user = await userService.GetUserAsync(userId.Value);
-            _loggedUser.Value.SetLoggedUser(new LoggedUserData {Id = user.Id, Username = user.Username});
+            _loggedUser.Value.SetLoggedUser(new LoggedUserData { Id = user.Id, Username = user.Username });
             context.Items["IsLogged"] = "true";
         }
 

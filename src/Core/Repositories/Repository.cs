@@ -31,8 +31,8 @@ public class Repository<T, AppContextT> : IRepository<T>
 
     public async Task<T> UpdateAsync(T entity)
     {
-        entity.UpdateAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Utc);
-        // entity.UpdateAt.Value.
+        var now = DateTime.UtcNow;
+        entity.UpdateAt = now;
         Entities.Update(entity);
         await _appContext.SaveChangesAsync();
         return entity;

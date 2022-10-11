@@ -1,3 +1,4 @@
+using Core.Utils;
 using SqlRunner;
 using SqlRunner.models;
 
@@ -7,20 +8,16 @@ public static class UserScriptRunner
 {
     public static void RunScripts(string connectionsString)
     {
+        var scriptPath = $"{PathUtils.GetModulePath("User.Core")}{Path.DirectorySeparatorChar}Scripts";
         var setupModel = new SetupModel
         {
             ConnectionString = connectionsString,
-            FolderPath = $"{GetPatchToScript()}",
+            FolderPath = scriptPath,
             DataBaseType = DataBaseTypeEnum.Postgresql,
-            DeployScriptsTableName = "DeployScripts"
+            DeployScriptsTableName = "UserDeployScripts",
+            InitFolderPath = $"{scriptPath}/Init"
+            
         };
         SqlScriptRunner.GetScriptRunner(setupModel).RunDeploy();
-    }
-
-    private static string GetPatchToScript()
-    {
-        var rootPath = Directory.GetParent(Directory.GetCurrentDirectory());
-
-        return $"{rootPath}{Path.DirectorySeparatorChar}User{Path.DirectorySeparatorChar}User.Core{Path.DirectorySeparatorChar}Scripts";
     }
 }

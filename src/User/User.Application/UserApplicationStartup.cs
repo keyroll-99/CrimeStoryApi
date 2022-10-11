@@ -10,7 +10,6 @@ public static class UserApplicationStartup
     public static IServiceCollection InstallUserApplication (this IServiceCollection services)
     {
         services.AddScoped<IUserService, UserService>();
-        services.AddAutoMapper(typeof(UserMapper));
         
         return services;
     }

@@ -76,25 +76,44 @@ public class AuthenticationService : IAuthenticationService
         return tokenHandler.WriteToken(token);
     }
 
-    public async Task<RefreshResponse> RefreshToken(string currentToken, string ipAddress)
+    public async Task<RefreshResponse> RefreshToken(string currentToken, string ipAddress, CancellationToken cancellationToken)
     {
-        if (!await IsValidRefreshToken(currentToken))
-        {
-            await RevokeAllConnectedRefreshToken(currentToken, ipAddress);
-            throw new ServerError("Invalid refresh token");
-        }
-
         var token = await _refreshTokenRepository.GetRefreshTokenByTokenAsync(currentToken);
 
-        await RevokeRefreshToken(token, ipAddress);
-        var newToken = await GenerateRefreshToken(token.UserId, ipAddress);
-        var jwt = GenerateJwt(token.UserId);
-
-        return new RefreshResponse
+        try
         {
-            Jwt = jwt,
-            RefreshToken = newToken
-        };
+            if (!await IsValidRefreshToken(currentToken))
+            {
+                throw new ServerError("Invalid refresh token");
+            }
+            
+            await RevokeRefreshToken(token, ipAddress);
+            var newToken = await GenerateRefreshToken(token.UserId, ipAddress);
+            var jwt = GenerateJwt(token.UserId);
+            
+            if (cancellationToken.IsCancellationRequested)
+            {
+                throw new ServerError("request is cancel");
+            }
+
+            return new RefreshResponse
+            {
+                Jwt = jwt,
+                RefreshToken = newToken
+            };
+        }
+        catch (ServerError)
+        {
+            await RevokeAllConnectedRefreshToken(currentToken, ipAddress);
+
+            if (cancellationToken.IsCancellationRequested)
+            {
+                token.IsUsed = false;
+                await _refreshTokenRepository.UpdateAsync(token);
+            }
+
+            throw;
+        }
     }
 
     public async Task<string> GenerateRefreshToken(long userId, string ipAddress)

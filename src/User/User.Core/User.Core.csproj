@@ -5,15 +5,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
-    <ItemGroup>
-      <Reference Include="SqlRunner">
-        <HintPath>..\..\..\..\..\..\..\..\.nuget\packages\sqlscriptrunner\0.1.4\lib\net6.0\SqlRunner.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
+    
     <ItemGroup>
       <ProjectReference Include="..\..\Core\Core.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <PackageReference Include="SqlScriptRunner" Version="0.2.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Config" />
     </ItemGroup>
 
 </Project>
