@@ -1,4 +1,6 @@
+using Core.Middleware;
 using Core.Models;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,5 +13,11 @@ public static class CoreStartup
         services.AddScoped<LoggedUser>();
 
         return services;
+    }
+
+    public static IApplicationBuilder UseCoreMiddleware(this IApplicationBuilder app)
+    {
+        app.UseMiddleware<CatchErrorMiddleware>();
+        return app;
     }
 }

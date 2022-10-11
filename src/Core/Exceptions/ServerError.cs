@@ -1,3 +1,5 @@
+using Core.Models;
+
 namespace Core.Exceptions;
 
 public class ServerError: Exception
@@ -12,5 +14,6 @@ public class ServerError: Exception
     {
         StatusCode = statusCode;
     }
-    
+
+    public static implicit operator BaseError(ServerError error) => new BaseError(error.Message, error.StatusCode);
 }
